@@ -55,6 +55,27 @@ function generateUUID() {
 }
 
 /**
+ * Determine the length of the provided list
+ *
+ * @param {number[]} list - The list to get the length of
+ * @returns {number} - The length of the list
+ */
+function getListOfNumbersLength(list) {
+	return list.length;
+}
+
+/**
+ * Retrieve the number at the specified index in a list
+ *
+ * @param {number[]} list - The list of numbers to source from
+ * @param {number} index - The index of the number to get
+ * @returns {number} - The number at the specified index
+ */
+function getNumberFromList(list, index) {
+	return list[index];
+}
+
+/**
  * Deletes all cards on a given page then deletes the page
  *
  * @param {text} pageId - integer id of page to delete
