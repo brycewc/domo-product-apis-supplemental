@@ -21,19 +21,22 @@ class Helpers {
 		contentType = 'application/json'
 	) {
 		try {
-			if (method.toUpperCase() === 'GET') {
-				return await codeengine.sendRequest(method, url);
-			} else {
-				return await codeengine.sendRequest(
-					method,
-					url,
-					body,
-					headers,
-					contentType
-				);
-			}
+			return await codeengine.sendRequest(
+				method,
+				url,
+				body,
+				headers,
+				contentType
+			);
 		} catch (error) {
-			console.error(`Error with ${method} request to ${url}:`, error);
+			console.error(
+				`Error with ${method} request to ${url}\nPayload:\n${JSON.stringify(
+					body,
+					null,
+					2
+				)}\nError:\n`,
+				error
+			);
 			throw error;
 		}
 	}
@@ -73,6 +76,19 @@ function getListOfNumbersLength(list) {
  */
 function getNumberFromList(list, index) {
 	return list[index];
+}
+
+/**
+ * Disable final table drilling on a card
+ *
+ * @param {number} cardId - The ID of the card to update
+ * @returns {null}
+ */
+async function disableTableDrill(cardId) {
+	const body = {
+		allowTableDrill: false
+	};
+	await handleRequest('PUT', `/api/content/v1/cards/${cardId}`, body);
 }
 
 /**
