@@ -79,16 +79,13 @@ function getNumberFromList(list, index) {
 }
 
 /**
- * Disable final table drilling on a card
+ * Retrieve the number at the specified index in a list
  *
- * @param {number} cardId - The ID of the card to update
- * @returns {null}
+ * @param {number} epoch - The Epoch timestamp to cast, sent as a number
+ * @returns {datetime} - The number at the specified index
  */
-async function disableTableDrill(cardId) {
-	const body = {
-		allowTableDrill: false
-	};
-	await handleRequest('PUT', `/api/content/v1/cards/${cardId}`, body);
+function castEpochTimestampNumberAsDatetime(epoch) {
+	return new Date(epoch);
 }
 
 /**
@@ -113,6 +110,48 @@ async function deletePageAndCards(pageId) {
 	await handleRequest('DELETE', `/api/content/v1/pages/${pageId}`);
 
 	return true;
+}
+
+/**
+ * Deletes/revokes an API access token by ID
+ *
+ * @param {integer} accessTokenId - ID of the access token
+ * @returns {null}
+ */
+async function deleteAccessToken(accessTokenId) {
+	await handleRequest('DELETE', `api/data/v1/accesstokens/${accessTokenId}`);
+}
+
+/**
+ * Get a user object from a person object
+ *
+ * @param {Person} person - The person
+ * @returns {object} user - Information about the person
+ */
+async function getPerson(person) {
+	const response = await handleRequest(
+		'GET',
+		`api/identity/v1/users/${person}?parts=detailed`
+	);
+	try {
+		const users = response.users;
+		const firstUser = users[0];
+		const attributes = firstUser.attributes;
+
+		if (!attributes || !attributes.length) return undefined;
+
+		const user = attributes.reduce(
+			(map, obj) => ({
+				...map,
+				[obj.key]: Array.isArray(obj.values) ? obj.values[0] : undefined
+			}),
+			{}
+		);
+		return user;
+	} catch (error) {
+		console.error('Error processing user attributes:', error);
+		return undefined;
+	}
 }
 
 /**
@@ -144,16 +183,6 @@ async function updateManager(userId, managerId) {
 	const url = `/api/content/v2/users/${userId}/teams`;
 	const payload = { reportsTo: [{ userId: managerId }] };
 	await handleRequest('POST', url, payload);
-}
-
-/**
- * Deletes/revokes an API access token by ID
- *
- * @param {integer} accessTokenId - ID of the access token
- * @returns {null}
- */
-async function deleteAccessToken(accessTokenId) {
-	await handleRequest('DELETE', `api/data/v1/accesstokens/${accessTokenId}`);
 }
 
 /**
