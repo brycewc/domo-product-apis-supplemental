@@ -155,21 +155,55 @@ async function getPerson(person) {
 }
 
 /**
- * Updates users in bulk
+ * Updates users in bulk from arrays of user properties (that's how trigger alerts pass them)
  *
- * @param {array of objects} users - array of user objects
- * @returns {boolean} result - true if successful
+ * @param {array of strings} ids - array of user IDs
+ * @param {array of strings} names - array of user display names
+ * @param {array of strings} titles - array of user titles
+ * @param {array of strings} departments - array of user departments
+ * @param {array of strings} employeeIds - array of user employee IDs
+ * @param {array of strings} employeeNumbers - array of user employee numbers
+ * @param {array of integers} hireDates - array of user hire dates as epoch timestamps in milliseconds
+ * @param {array of strings} reportsToIds - array of user manager IDs
  */
-async function bulkUpdateUsers(users) {
-	const body = {
-		transactionId: generateUUID(),
-		users
-	};
-	const updateUsersResponse = await handleRequest(
-		'PUT',
-		'api/content/v2/users/bulk'
-	);
-	return true;
+async function bulkUpdateUsersFromArrays(
+	ids,
+	names,
+	titles,
+	departments,
+	employeeIds,
+	employeeNumbers,
+	hireDates,
+	reportsToIds
+) {
+	// Build full user objects first to ensure aligned indices
+	const allUsers = ids.map((id, index) => ({
+		id,
+		displayName: names[index],
+		title: titles[index],
+		department: departments[index],
+		// email: emails[index],
+		// alternateEmail: alternateEmails[index],
+		// phoneNumber: phoneNumbers[index],
+		// deskPhoneNumber: deskPhoneNumbers[index],
+		// location: locations[index],
+		// timeZone: timeZones[index],
+		// locale: locales[index],
+		employeeId: employeeIds[index],
+		employeeNumber: employeeNumbers[index],
+		hireDate: hireDates[index],
+		reportsTo: reportsToIds[index]
+	}));
+
+	const batchSize = 50;
+	for (let i = 0; i < allUsers.length; i += batchSize) {
+		const batch = allUsers.slice(i, i + batchSize);
+		const body = {
+			transactionId: generateUUID(),
+			users: batch
+		};
+		await handleRequest('PUT', 'api/content/v2/users/bulk', body);
+	}
 }
 
 /**
@@ -183,6 +217,19 @@ async function updateManager(userId, managerId) {
 	const url = `/api/content/v2/users/${userId}/teams`;
 	const payload = { reportsTo: [{ userId: managerId }] };
 	await handleRequest('POST', url, payload);
+}
+
+/**
+ * Updates roles for multiple users
+ * @param {Person[]} people - The people
+ * @param {integer} roleId - The new role
+ */
+async function bulkUpdateUserRoles(people, roleId) {
+	await handleRequest(
+		'PUT',
+		`/api/authorization/v1/roles/${roleId}/users`,
+		people
+	);
 }
 
 /**
