@@ -5,13 +5,13 @@ const codeengine = require('codeengine');
 class Helpers {
 	/**
 	 * Helper function to handle API requests and errors
-	 * @param {text} method - The HTTP method
-	 * @param {text} url - The endpoint URL
-	 * @param {Object} [body=null] - The request body
-	 * @param {Object} [headers=null] - The request headers
-	 * @param {text} [content='application/json'] - Request body content type
-	 * @returns {Object} The response data
-	 * @throws {Error} If the request fails
+	 * @param {string} method - The HTTP method
+	 * @param {string} url - The endpoint URL
+	 * @param {object} [body=null] - The request body
+	 * @param {object} [headers=null] - The request headers
+	 * @param {string} [content='application/json'] - Request body content type
+	 * @returns {object} The response data
+	 * @throws {error} If the request fails
 	 */
 	static async handleRequest(
 		method,
@@ -60,8 +60,8 @@ function generateUUID() {
 /**
  * Determine the length of the provided list
  *
- * @param {number[]} list - The list to get the length of
- * @returns {number} - The length of the list
+ * @param {integer[]} list - The list to get the length of
+ * @returns {integer} - The length of the list
  */
 function getListOfNumbersLength(list) {
 	return list.length;
@@ -70,9 +70,9 @@ function getListOfNumbersLength(list) {
 /**
  * Retrieve the number at the specified index in a list
  *
- * @param {number[]} list - The list of numbers to source from
- * @param {number} index - The index of the number to get
- * @returns {number} - The number at the specified index
+ * @param {integer[]} list - The list of numbers to source from
+ * @param {integer} index - The index of the number to get
+ * @returns {integer} - The number at the specified index
  */
 function getNumberFromList(list, index) {
 	return list[index];
@@ -81,7 +81,7 @@ function getNumberFromList(list, index) {
 /**
  * Retrieve the number at the specified index in a list
  *
- * @param {number} epoch - The Epoch timestamp to cast, sent as a number
+ * @param {integer} epoch - The Epoch timestamp to cast, sent as a number
  * @returns {datetime} - The number at the specified index
  */
 function castEpochTimestampNumberAsDatetime(epoch) {
@@ -91,7 +91,7 @@ function castEpochTimestampNumberAsDatetime(epoch) {
 /**
  * Deletes all cards on a given page then deletes the page
  *
- * @param {text} pageId - integer id of page to delete
+ * @param {string} pageId - integer id of page to delete
  * @returns {boolean} result - true if successful
  */
 async function deletePageAndCards(pageId) {
@@ -123,48 +123,16 @@ async function deleteAccessToken(accessTokenId) {
 }
 
 /**
- * Get a user object from a person object
- *
- * @param {Person} person - The person
- * @returns {object} user - Information about the person
- */
-async function getPerson(person) {
-	const response = await handleRequest(
-		'GET',
-		`api/identity/v1/users/${person}?parts=detailed`
-	);
-	try {
-		const users = response.users;
-		const firstUser = users[0];
-		const attributes = firstUser.attributes;
-
-		if (!attributes || !attributes.length) return undefined;
-
-		const user = attributes.reduce(
-			(map, obj) => ({
-				...map,
-				[obj.key]: Array.isArray(obj.values) ? obj.values[0] : undefined
-			}),
-			{}
-		);
-		return user;
-	} catch (error) {
-		console.error('Error processing user attributes:', error);
-		return undefined;
-	}
-}
-
-/**
  * Updates users in bulk from arrays of user properties (that's how trigger alerts pass them)
  *
- * @param {array of strings} ids - array of user IDs
- * @param {array of strings} names - array of user display names
- * @param {array of strings} titles - array of user titles
- * @param {array of strings} departments - array of user departments
- * @param {array of strings} employeeIds - array of user employee IDs
- * @param {array of strings} employeeNumbers - array of user employee numbers
- * @param {array of integers} hireDates - array of user hire dates as epoch timestamps in milliseconds
- * @param {array of strings} reportsToIds - array of user manager IDs
+ * @param {string[]} ids - user IDs
+ * @param {string[]} names - user display names
+ * @param {string[]} titles - user titles
+ * @param {string[]} departments - user departments
+ * @param {string[]} employeeIds - user employee IDs
+ * @param {string[]} employeeNumbers - user employee numbers
+ * @param {integer[]} hireDates - user hire dates as epoch timestamps in milliseconds
+ * @param {string[]} reportsToIds - user manager IDs
  */
 async function bulkUpdateUsersFromArrays(
 	ids,
@@ -176,7 +144,7 @@ async function bulkUpdateUsersFromArrays(
 	hireDates,
 	reportsToIds
 ) {
-	// Build full user objects first to ensure aligned indices
+	// Build full user object[] first to ensure aligned indices
 	const allUsers = ids.map((id, index) => ({
 		id,
 		displayName: names[index],
@@ -236,7 +204,7 @@ async function bulkUpdateUserRoles(people, roleId) {
  * Get users that have a grant (or grants by comma separated values)
  *
  * @param {string} grant - grant or grants to search for
- * @returns {array of objects} users - Array of users that have that grant
+ * @returns {object[]} users - Array of users that have that grant
  */
 async function getUsersByGrant(grant) {
 	const limit = 100;
@@ -271,7 +239,7 @@ async function getUsersByGrant(grant) {
  * Gets members of a group
  *
  * @param {integer} groupId - ID of the group
- * @returns {array of objects} members - Array of users in the group
+ * @returns {object[]} members - Array of users in the group
  */
 async function getGroupMembers(groupId) {
 	const response = await handleRequest(
@@ -286,8 +254,8 @@ async function getGroupMembers(groupId) {
  * Updates members of a group
  *
  * @param {integer} groupId - ID of the group
- * @param {array of objects} addMembers - Array of users to add
- * @param {array of objects} removeMembers- Array of users to remove
+ * @param {object[]} addMembers - Array of users to add
+ * @param {object[]} removeMembers- Array of users to remove
  * @returns {null}
  */
 async function updateGroupMembers(groupId, addMembers, removeMembers) {
@@ -312,4 +280,86 @@ async function updateGroupMembers(groupId, addMembers, removeMembers) {
 		}
 	];
 	await handleRequest('PUT', '/api/content/v2/groups/access', body);
+}
+
+/**
+ * Get a user object from a person object
+ *
+ * @param {Person} person - The person
+ * @returns {object} user - Information about the person
+ * 	Properties:
+ * 	- id {integer}
+ *  - displayName {string}
+ *  - userName {string}
+ *  - emailAddress {string}
+ *  - modified {integer}
+ *  - created {integer}
+ *  - roleId {integer}
+ *  - isSystemUser {boolean}
+ *  - isActive {boolean}
+ */
+async function getPerson(person) {
+	const response = await handleRequest(
+		'GET',
+		`api/identity/v1/users/${person}?parts=detailed`
+	);
+	try {
+		const users = response.users;
+		const firstUser = users[0];
+		const attributes = firstUser.attributes;
+
+		if (!attributes || !attributes.length) return undefined;
+
+		const user = attributes.reduce(
+			(map, obj) => ({
+				...map,
+				[obj.key]: Array.isArray(obj.values) ? obj.values[0] : undefined
+			}),
+			{}
+		);
+		return user;
+	} catch (error) {
+		console.error('Error processing user attributes:', error);
+		return undefined;
+	}
+}
+
+/**
+ * Casts a text user ID to a person object
+ *
+ * @param {string} userId - ID of the user
+ * @returns {Person} person - Person object
+ */
+async function castUserIdToPerson(userId) {
+	return userId;
+}
+
+/**
+ * Casts a number user ID to a person object
+ *
+ * @param {integer} userId - ID of the user
+ * @returns {Person} person - Person object
+ */
+async function castUserIdNumToPerson(userId) {
+	return userId.toString();
+}
+
+/**
+ * Casts a text list of user IDs to persons list
+ *
+ * @param {string[]} userIds - IDs of the users
+ * @returns {Person[]} persons - Array of person objects
+ */
+async function castUserIdListToPersonList(userIds) {
+	return userIds;
+}
+
+/**
+ * Casts a number list of user IDs to persons list
+ *
+ * @param {integer[]} userIds - IDs of the users
+ * @returns {Person[]} persons - Array of person objects
+ */
+async function castUserIdNumListToPersonList(userIds) {
+	return userIds.map(String);
 }
