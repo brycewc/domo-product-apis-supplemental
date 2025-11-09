@@ -79,7 +79,7 @@ function getNumberFromList(list, index) {
 }
 
 /**
- * Retrieve the number at the specified index in a list
+ * Takes an Epoch timestamp as a number and converts it to datetime
  *
  * @param {integer} epoch - The Epoch timestamp to cast, sent as a number
  * @returns {datetime} - The number at the specified index
@@ -325,7 +325,7 @@ async function getPerson(person) {
 }
 
 /**
- * Casts a text user ID to a person object
+ * Casts a string User ID to a person object
  *
  * @param {string} userId - ID of the user
  * @returns {Person} person - Person object
@@ -335,7 +335,7 @@ async function castUserIdToPerson(userId) {
 }
 
 /**
- * Casts a number user ID to a person object
+ * Casts an integer User ID to a person object
  *
  * @param {integer} userId - ID of the user
  * @returns {Person} person - Person object
@@ -345,7 +345,7 @@ async function castUserIdNumToPerson(userId) {
 }
 
 /**
- * Casts a text list of user IDs to persons list
+ * Casts an array of integer User IDs to an array of person objects
  *
  * @param {string[]} userIds - IDs of the users
  * @returns {Person[]} persons - Array of person objects
@@ -355,11 +355,21 @@ async function castUserIdListToPersonList(userIds) {
 }
 
 /**
- * Casts a number list of user IDs to persons list
+ * Casts an array of integer User IDs to an array of person objects
  *
  * @param {integer[]} userIds - IDs of the users
  * @returns {Person[]} persons - Array of person objects
  */
 async function castUserIdNumListToPersonList(userIds) {
 	return userIds.map(String);
+}
+
+/**
+ * Concatenates a list of numbers into a text string separated by the specified separator
+ *
+ * @param {integer[]} list - Array of integers
+ * @returns {string} concatenatedList - Concatenated string of integers
+ */
+async function concatNumList(list, separator = ',') {
+	return list.join(separator);
 }
