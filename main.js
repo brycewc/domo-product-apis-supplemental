@@ -177,14 +177,24 @@ async function bulkUpdateUsersFromArrays(
 /**
  * Updates reportsTo field (manager) of a user
  *
- * @param {integer} userId - ID of user to update
+ * @param {integer} userId - ID of the user to update
  * @param {integer} managerId - ID of the manager user to set as reportsTo
- * @returns {null}
  */
 async function updateManager(userId, managerId) {
 	const url = `/api/content/v2/users/${userId}/teams`;
 	const payload = { reportsTo: [{ userId: managerId }] };
 	await handleRequest('POST', url, payload);
+}
+
+/**
+ * Updates specified attributes for a user
+ * @param {integer} userId - ID of the user to update
+ * @param {object[]} attributes - An array of attribute objects, with key and values properties
+ */
+async function updateUserAttributes(userId, attributes) {
+	await handleRequest('PATCH', `/api/identity/v1/users/${userId}`, {
+		attributes
+	});
 }
 
 /**
