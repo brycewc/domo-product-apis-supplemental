@@ -383,3 +383,36 @@ async function castUserIdNumListToPersonList(userIds) {
 async function concatNumList(list, separator = ',') {
 	return list.join(separator);
 }
+
+/**
+ * Appends an object to an array of objects
+ *
+ * @param {object} object - Object to append
+ * @param {object[]} list - Array of objects to append to
+ * @returns {object[]} newList - Resulting array of objects
+ */
+async function addObjectToList(object, list) {
+	return list.concat(object);
+}
+
+/**
+ * Appends a string to an array of strings
+ *
+ * @param {string} string - String to append
+ * @param {string[]} list - Array of strings to append to
+ * @returns {string[]} newList - Resulting array of strings
+ */
+async function addStringToList(string, list) {
+	return list.concat(string);
+}
+
+/**
+ * Returns account properties with secrets exposed
+ *
+ * @param {Account} account - Account to return properties from
+ * @returns {object} result - Account properties
+ */
+async function readAccountCredentials(account) {
+	const acc = await codeengine.getAccount(account.id);
+	return acc.properties;
+}
