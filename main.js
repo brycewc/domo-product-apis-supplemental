@@ -293,6 +293,88 @@ async function updateGroupMembers(groupId, addMembers, removeMembers) {
 }
 
 /**
+ * Search for users
+ *
+ * @param {object} query - The query to search for
+ * Example:
+ * {
+ * "field": "reportsTo",
+ * "values": [
+ * "123456"
+ * ],
+ * "operator": "EQ",
+ * "filterType": "value"
+ * }
+ * @returns {object[]} users - Array of users that match the query
+ * Properties:
+ * 	- id {integer}
+ *  - displayName {string}
+ *  - userName {string}
+ *  - emailAddress {string}
+ *  - modified {integer}
+ *  - created {integer}
+ *  - roleId {integer}
+ *  - isSystemUser {boolean}
+ *  - isActive {boolean}
+ */
+async function searchUsers(query) {
+	const limit = 100;
+	let offset = 0;
+	let allUsers = [];
+	let hasMoreData = true;
+
+	while (hasMoreData) {
+		const body = {
+			cacheBuster: new Date().getTime(),
+			showCount: true,
+			count: false,
+			includeDeleted: false,
+			onlyDeleted: false,
+			includeSupport: false,
+			offset,
+			limit,
+			sort: {
+				field: 'created',
+				order: 'DESC'
+			},
+			filters: [query],
+			parts: ['DETAILED']
+		};
+		const response = await handleRequest(
+			'POST',
+			`api/identity/v1/users/search?explain=false`,
+			body
+		);
+		try {
+			const users = response.users;
+
+			const formattedUsers = users.map((user) =>
+				user.attributes.reduce(
+					(map, obj) => ({
+						...map,
+						[obj.key]: Array.isArray(obj.values) ? obj.values[0] : undefined
+					}),
+					{}
+				)
+			);
+			allUsers.push(...formattedUsers);
+
+			const totalCount = response.count;
+			if (response.users.length < limit) {
+				hasMoreData = false;
+			}
+			if (totalCount && allUsers.length < totalCount) {
+				offset += limit;
+			}
+		} catch (error) {
+			console.error('Error processing user attributes:', error);
+			hasMoreData = false;
+		}
+	}
+	return allUsers;
+}
+
+/**
  * Get a user object from a person object
  *
  * @param {Person} person - The person
@@ -391,8 +473,12 @@ async function concatNumList(list, separator = ',') {
  * @param {object[]} list - Array of objects to append to
  * @returns {object[]} newList - Resulting array of objects
  */
-async function addObjectToList(object, list) {
-	return list.concat(object);
+async function addObjectToList(object, list = []) {
+	if (list.length) {
+		return list.concat(object);
+	} else {
+		return [object];
+	}
 }
 
 /**
@@ -402,8 +488,12 @@ async function addObjectToList(object, list) {
  * @param {string[]} list - Array of strings to append to
  * @returns {string[]} newList - Resulting array of strings
  */
-async function addStringToList(string, list) {
-	return list.concat(string);
+async function addStringToList(string, list = []) {
+	if (list.length) {
+		return list.concat(string);
+	} else {
+		return [string];
+	}
 }
 
 /**
