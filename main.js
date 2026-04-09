@@ -136,13 +136,14 @@ async function deleteAccessToken(accessTokenId) {
  */
 async function bulkUpdateUsersFromArrays(
 	ids,
-	names,
-	titles,
-	departments,
-	employeeIds,
-	employeeNumbers,
-	hireDates,
-	reportsToIds
+	names = [],
+	titles = [],
+	departments = [],
+	phoneNumbers = [],
+	employeeIds = [],
+	employeeNumbers = [],
+	hireDates = [],
+	reportsToIds = []
 ) {
 	// Build full user object[] first to ensure aligned indices
 	const allUsers = ids.map((id, index) => ({
@@ -150,9 +151,9 @@ async function bulkUpdateUsersFromArrays(
 		displayName: names[index],
 		title: titles[index],
 		department: departments[index],
+		phoneNumber: phoneNumbers[index],
 		// email: emails[index],
 		// alternateEmail: alternateEmails[index],
-		// phoneNumber: phoneNumbers[index],
 		// deskPhoneNumber: deskPhoneNumbers[index],
 		// location: locations[index],
 		// timeZone: timeZones[index],
@@ -494,6 +495,16 @@ async function addStringToList(string, list = []) {
 	} else {
 		return [string];
 	}
+}
+
+/**
+ * Checks if an object is empty
+ *
+ * @param {object} obj - Object to check
+ * @returns {boolean} empty - Whether the obj is empty or not
+ */
+function checkEmptyObject(obj = {}){
+  return Object.keys(obj).length === 0;
 }
 
 /**
