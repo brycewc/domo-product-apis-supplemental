@@ -101,9 +101,9 @@ async function deleteAccessToken(accessTokenId) {
 }
 
 /**
- * Updates users in bulk from arrays of user properties (that's how trigger alerts pass them)
+ * Updates users in bulk
  *
- * @param {object[]} allUsers
+ * @param {object[]} users
  * 	Properties:
  * 	- id {string}
  *  - displayName {string}
@@ -115,18 +115,14 @@ async function deleteAccessToken(accessTokenId) {
  *  - reportsTo {string}
  *  - phoneNumber {string}
  */
-async function bulkUpdateUsers(allUsers) {
-	const batchSize = 50;
-	for (let i = 0; i < allUsers.length; i += batchSize) {
-		const batch = allUsers.slice(i, i + batchSize).map(user => ({
-			...user,
-			phoneNumber: user.phoneNumber === 'empty' ? null : user.phoneNumber
+async function bulkUpdateUsers(users) {
+	for (const user of users) {
+		const { id, ...properties } = user;
+		const attributes = Object.entries(properties).map(([key, value]) => ({
+			key,
+			values: [value === 'empty' ? null : value]
 		}));
-		const body = {
-			transactionId: generateUUID(),
-			users: batch
-		};
-		await handleRequest('PUT', 'api/content/v2/users/bulk', body);
+		await updateUserAttributes(id, attributes);
 	}
 }
 
