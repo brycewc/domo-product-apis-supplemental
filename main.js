@@ -13,28 +13,12 @@ class Helpers {
 	 * @returns {object} The response data
 	 * @throws {error} If the request fails
 	 */
-	static async handleRequest(
-		method,
-		url,
-		body = null,
-		headers = null,
-		contentType = 'application/json'
-	) {
+	static async handleRequest(method, url, body = null, headers = null, contentType = 'application/json') {
 		try {
-			return await codeengine.sendRequest(
-				method,
-				url,
-				body,
-				headers,
-				contentType
-			);
+			return await codeengine.sendRequest(method, url, body, headers, contentType);
 		} catch (error) {
 			console.error(
-				`Error with ${method} request to ${url}\nPayload:\n${JSON.stringify(
-					body,
-					null,
-					2
-				)}\nError:\n`,
+				`Error with ${method} request to ${url}\nPayload:\n${JSON.stringify(body, null, 2)}\nError:\n`,
 				error
 			);
 			throw error;
@@ -95,17 +79,11 @@ function castEpochTimestampNumberAsDatetime(epoch) {
  * @returns {boolean} result - true if successful
  */
 async function deletePageAndCards(pageId) {
-	const page = await handleRequest(
-		'GET',
-		`/api/content/v3/stacks/${pageId}/cards`
-	);
+	const page = await handleRequest('GET', `/api/content/v3/stacks/${pageId}/cards`);
 
 	const cardIds = page.cards.map((card) => card.id).join(',');
 
-	await handleRequest(
-		'DELETE',
-		`/api/content/v1/cards/bulk?cardIds=${cardIds}`
-	);
+	await handleRequest('DELETE', `/api/content/v1/cards/bulk?cardIds=${cardIds}`);
 
 	await handleRequest('DELETE', `/api/content/v1/pages/${pageId}`);
 
@@ -125,48 +103,25 @@ async function deleteAccessToken(accessTokenId) {
 /**
  * Updates users in bulk from arrays of user properties (that's how trigger alerts pass them)
  *
- * @param {string[]} ids - user IDs
- * @param {string[]} names - user display names
- * @param {string[]} titles - user titles
- * @param {string[]} departments - user departments
- * @param {string[]} employeeIds - user employee IDs
- * @param {string[]} employeeNumbers - user employee numbers
- * @param {integer[]} hireDates - user hire dates as epoch timestamps in milliseconds
- * @param {string[]} reportsToIds - user manager IDs
+ * @param {object[]} allUsers
+ * 	Properties:
+ * 	- id {string}
+ *  - displayName {string}
+ *  - title {string}
+ *  - department {string}
+ *  - employeeId {string}
+ *  - employeeNumber {string}
+ *  - hireDate {integer}
+ *  - reportsTo {string}
+ *  - phoneNumber {string}
  */
-async function bulkUpdateUsersFromArrays(
-	ids,
-	names = [],
-	titles = [],
-	departments = [],
-	phoneNumbers = [],
-	employeeIds = [],
-	employeeNumbers = [],
-	hireDates = [],
-	reportsToIds = []
-) {
-	// Build full user object[] first to ensure aligned indices
-	const allUsers = ids.map((id, index) => ({
-		id,
-		displayName: names[index],
-		title: titles[index],
-		department: departments[index],
-		phoneNumber: phoneNumbers[index],
-		// email: emails[index],
-		// alternateEmail: alternateEmails[index],
-		// deskPhoneNumber: deskPhoneNumbers[index],
-		// location: locations[index],
-		// timeZone: timeZones[index],
-		// locale: locales[index],
-		employeeId: employeeIds[index],
-		employeeNumber: employeeNumbers[index],
-		hireDate: hireDates[index],
-		reportsTo: reportsToIds[index]
-	}));
-
+async function bulkUpdateUsers(allUsers) {
 	const batchSize = 50;
 	for (let i = 0; i < allUsers.length; i += batchSize) {
-		const batch = allUsers.slice(i, i + batchSize);
+		const batch = allUsers.slice(i, i + batchSize).map(user => ({
+			...user,
+			phoneNumber: user.phoneNumber === 'empty' ? null : user.phoneNumber
+		}));
 		const body = {
 			transactionId: generateUUID(),
 			users: batch
@@ -204,11 +159,7 @@ async function updateUserAttributes(userId, attributes) {
  * @param {integer} roleId - The new role
  */
 async function bulkUpdateUserRoles(people, roleId) {
-	await handleRequest(
-		'PUT',
-		`/api/authorization/v1/roles/${roleId}/users`,
-		people
-	);
+	await handleRequest('PUT', `/api/authorization/v1/roles/${roleId}/users`, people);
 }
 
 /**
@@ -253,10 +204,7 @@ async function getUsersByGrant(grant) {
  * @returns {object[]} members - Array of users in the group
  */
 async function getGroupMembers(groupId) {
-	const response = await handleRequest(
-		'GET',
-		`/api/content/v2/groups/${groupId}/permissions?includeUsers=true`
-	);
+	const response = await handleRequest('GET', `/api/content/v2/groups/${groupId}/permissions?includeUsers=true`);
 	let members = response.members.filter((m) => m.type != 'GROUP');
 	return members;
 }
@@ -280,9 +228,7 @@ async function updateGroupMembers(groupId, addMembers, removeMembers) {
 		type: 'USER'
 	}));
 	// Filter out removeMembers from addMembers
-	addMembers = addMembers.filter(
-		(m) => !removeMembers.some((r) => r.id === m.id)
-	);
+	addMembers = addMembers.filter((m) => !removeMembers.some((r) => r.id === m.id));
 	const body = [
 		{
 			groupId,
@@ -341,11 +287,7 @@ async function searchUsers(query) {
 			filters: [query],
 			parts: ['DETAILED']
 		};
-		const response = await handleRequest(
-			'POST',
-			`api/identity/v1/users/search?explain=false`,
-			body
-		);
+		const response = await handleRequest('POST', `api/identity/v1/users/search?explain=false`, body);
 		try {
 			const users = response.users;
 
@@ -392,10 +334,7 @@ async function searchUsers(query) {
  *  - isActive {boolean}
  */
 async function getPerson(person) {
-	const response = await handleRequest(
-		'GET',
-		`api/identity/v1/users/${person}?parts=detailed`
-	);
+	const response = await handleRequest('GET', `api/identity/v1/users/${person}?parts=detailed`);
 	try {
 		const users = response.users;
 		const firstUser = users[0];
@@ -503,8 +442,8 @@ async function addStringToList(string, list = []) {
  * @param {object} obj - Object to check
  * @returns {boolean} empty - Whether the obj is empty or not
  */
-function checkEmptyObject(obj = {}){
-  return Object.keys(obj).length === 0;
+function checkEmptyObject(obj = {}) {
+	return Object.keys(obj).length === 0;
 }
 
 /**
