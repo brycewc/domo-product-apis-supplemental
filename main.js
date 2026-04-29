@@ -77,13 +77,13 @@ function castEpochTimestampNumberAsDatetime(epoch) {
  * Shares a dataset with a person
  *
  * @param {Dataset} dataset - The dataset
- * @param {Person[]} person - The person to share the dataset with
+ * @param {Person} person - The person to share the dataset with
  * @param {string} permission - The permission level to share the dataset with (default: 'CAN_SHARE')
  * @param {string} message - The message to include in the share email (default: 'I thought you might find this dataset interesting.')
  * @param {boolean} sendEmail - Whether to send an email notification to the person (default: false)
  * @returns {null}
  */
-async function shareDataSet(
+async function shareDatasetWithPerson(
 	dataset,
 	person,
 	permission = 'CAN_SHARE',
