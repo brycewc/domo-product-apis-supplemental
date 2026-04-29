@@ -5,6 +5,7 @@ const codeengine = require('codeengine');
 class Helpers {
 	/**
 	 * Helper function to handle API requests and errors
+	 *
 	 * @param {string} method - The HTTP method
 	 * @param {string} url - The endpoint URL
 	 * @param {object} [body=null] - The request body
@@ -70,6 +71,35 @@ function getNumberFromList(list, index) {
  */
 function castEpochTimestampNumberAsDatetime(epoch) {
 	return new Date(epoch);
+}
+
+/**
+ * Shares a dataset with a person
+ *
+ * @param {Dataset} dataset - The dataset
+ * @param {Person[]} person - The person to share the dataset with
+ * @param {string} permission - The permission level to share the dataset with (default: 'CAN_SHARE')
+ * @param {string} message - The message to include in the share email (default: 'I thought you might find this dataset interesting.')
+ * @param {boolean} sendEmail - Whether to send an email notification to the person (default: false)
+ * @returns {null}
+ */
+async function shareDataSet(
+	dataset,
+	person,
+	permission = 'CAN_SHARE',
+	message = 'I thought you might find this dataset interesting.',
+	sendEmail = false
+) {
+	const body = {
+		permissions: {
+			accessLevel: permission,
+			id: person,
+			type: 'USER'
+		},
+		message,
+		sendEmail
+	};
+	await handleRequest('POST', `/api/data/v3/datasources/${dataset}/share`, body);
 }
 
 /**
