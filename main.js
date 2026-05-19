@@ -116,9 +116,37 @@ async function shareDatasetWithPerson(
 }
 
 /**
+ * @summary Share DataSet with Group
+ * @description Shares a dataset with a group
+ * @param {dataset} dataset - The dataset
+ * @param {group} group - The group to share the dataset with
+ * @param {text} [permission='CAN_SHARE'] - The permission level to share the dataset with
+ * @param {text} [message='I thought you might find this dataset interesting.'] - The message to include in the share email
+ * @param {boolean} [sendEmail=false] - Whether to send an email notification to the group
+ */
+async function shareDatasetWithGroup(
+	dataset,
+	group,
+	permission = 'CAN_SHARE',
+	message = 'I thought you might find this dataset interesting.',
+	sendEmail = false
+) {
+	const body = {
+		permissions: {
+			accessLevel: permission,
+			id: group,
+			type: 'GROUP'
+		},
+		message,
+		sendEmail
+	};
+	await handleRequest('POST', `/api/data/v3/datasources/${dataset}/share`, body);
+}
+
+/**
  * @summary Delete Page and Cards
  * @description Deletes all cards on a given page then deletes the page
- * @param {text} pageId - integer id of page to delete
+ * @param {number} pageId - integer id of page to delete
  * @returns {boolean} result - true if successful
  */
 async function deletePageAndCards(pageId) {
@@ -395,7 +423,7 @@ async function getPerson(person) {
 }
 
 /**
- * @summary Cast User ID to Person
+ * @summary Cast User ID Text to Person
  * @description Casts a string User ID to a person object
  * @param {text} userId - ID of the user
  * @returns {person} person - Person object
@@ -415,7 +443,7 @@ async function castUserIdNumToPerson(userId) {
 }
 
 /**
- * @summary Cast User ID List to Person List
+ * @summary Cast User ID Text List to Person List
  * @description Casts an array of text User IDs to an array of person objects
  * @param {text[]} userIds - IDs of the users
  * @returns {person[]} persons - Array of person objects
