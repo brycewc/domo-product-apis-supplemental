@@ -95,6 +95,7 @@ function castEpochTimestampNumberAsDatetime(epoch) {
  * @param {text} [permission='CAN_SHARE'] - The permission level to share the dataset with
  * @param {text} [message='I thought you might find this dataset interesting.'] - The message to include in the share email
  * @param {boolean} [sendEmail=false] - Whether to send an email notification to the person
+ * @returns {boolean} success - true if the share succeeded, false if it failed
  */
 async function shareDatasetWithPerson(
 	dataset,
@@ -104,15 +105,20 @@ async function shareDatasetWithPerson(
 	sendEmail = false
 ) {
 	const body = {
-		permissions: {
+		permissions: [{
 			accessLevel: permission,
 			id: person,
 			type: 'USER'
-		},
+		}],
 		message,
 		sendEmail
 	};
-	await handleRequest('POST', `/api/data/v3/datasources/${dataset}/share`, body);
+	try {
+		await handleRequest('POST', `/api/data/v3/datasources/${dataset}/share`, body);
+		return true;
+	} catch (error) {
+		return false;
+	}
 }
 
 /**
@@ -123,6 +129,7 @@ async function shareDatasetWithPerson(
  * @param {text} [permission='CAN_SHARE'] - The permission level to share the dataset with
  * @param {text} [message='I thought you might find this dataset interesting.'] - The message to include in the share email
  * @param {boolean} [sendEmail=false] - Whether to send an email notification to the group
+ * @returns {boolean} success - true if the share succeeded, false if it failed
  */
 async function shareDatasetWithGroup(
 	dataset,
@@ -132,15 +139,20 @@ async function shareDatasetWithGroup(
 	sendEmail = false
 ) {
 	const body = {
-		permissions: {
+		permissions: [{
 			accessLevel: permission,
 			id: group,
 			type: 'GROUP'
-		},
+		}],
 		message,
 		sendEmail
 	};
-	await handleRequest('POST', `/api/data/v3/datasources/${dataset}/share`, body);
+	try {
+		await handleRequest('POST', `/api/data/v3/datasources/${dataset}/share`, body);
+		return true;
+	} catch (error) {
+		return false;
+	}
 }
 
 /**
@@ -477,7 +489,7 @@ async function concatNumList(list, separator = ',') {
  * @summary Add Object to List
  * @description Appends an object to an array of objects
  * @param {object} object - Object to append
- * @param {object[]} list - Array of objects to append to
+ * @param {object[]} [list=[]] - Array of objects to append to
  * @returns {object[]} newList - Resulting array of objects
  */
 async function addObjectToList(object, list = []) {
@@ -492,7 +504,7 @@ async function addObjectToList(object, list = []) {
  * @summary Add String to List
  * @description Appends a string to an array of strings
  * @param {text} string - String to append
- * @param {text[]} list - Array of strings to append to
+ * @param {text[]} [list=[]] - Array of strings to append to
  * @returns {text[]} newList - Resulting array of strings
  */
 async function addStringToList(string, list = []) {
@@ -506,7 +518,7 @@ async function addStringToList(string, list = []) {
 /**
  * @summary Check Empty Object
  * @description Checks if an object is empty
- * @param {object} obj - Object to check
+ * @param {object} [obj={}] - Object to check
  * @returns {boolean} empty - Whether the obj is empty or not
  */
 function checkEmptyObject(obj = {}) {
