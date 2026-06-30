@@ -105,11 +105,13 @@ async function shareDatasetWithPerson(
 	sendEmail = false
 ) {
 	const body = {
-		permissions: [{
-			accessLevel: permission,
-			id: person,
-			type: 'USER'
-		}],
+		permissions: [
+			{
+				accessLevel: permission,
+				id: person,
+				type: 'USER'
+			}
+		],
 		message,
 		sendEmail
 	};
@@ -139,11 +141,13 @@ async function shareDatasetWithGroup(
 	sendEmail = false
 ) {
 	const body = {
-		permissions: [{
-			accessLevel: permission,
-			id: group,
-			type: 'GROUP'
-		}],
+		permissions: [
+			{
+				accessLevel: permission,
+				id: group,
+				type: 'GROUP'
+			}
+		],
 		message,
 		sendEmail
 	};
@@ -250,31 +254,63 @@ async function bulkUpdateUserRoles(people, roleId) {
  * @returns {object[]} users - Array of users that have that grant
  */
 async function getUsersByGrant(grant) {
-	const limit = 100;
-	let offset = 0;
-	let hasMoreData = true;
-	let users = [];
+	// Split the comma-separated grants and normalize
+	const grants = grant
+		.split(',')
+		.map((g) => g.trim())
+		.filter(Boolean);
 
-	while (hasMoreData) {
-		let response = await handleRequest(
+	if (grants.length === 0) {
+		throw new Error('No grant(s) provided to getUsersByGrant');
+	}
+
+	// Collect a de-duplicated set of user IDs across all grants.
+	// The POST multi-authority endpoint returns 403, so we call the
+	// GET endpoint once per authority and merge the results.
+	const userIds = new Set();
+
+	for (const authority of grants) {
+		const response = await handleRequest(
 			'GET',
-			`/api/content/v1/typeahead?type=userByEmail&authorities=${grant}&limit=${limit}&offset=${offset}`
+			`/api/authorization/v1/authorities/${encodeURIComponent(authority)}/users-ids`
 		);
-		console.log('Response:', response);
-		if (!response || !response.users) {
-			throw new Error('Invalid response from getUsersByGrant');
+
+		// This endpoint returns a bare array of numeric user IDs
+		if (!Array.isArray(response)) {
+			throw new Error(`Invalid response from getUsersByGrant for authority "${authority}"`);
 		}
+
+		response.forEach((id) => userIds.add(id.toString()));
+	}
+
+	if (userIds.size === 0) {
+		return [];
+	}
+
+	// The authorities endpoint only returns IDs, so hydrate full user
+	// details via the batch users/{ids} lookup. Chunk the IDs to keep
+	// each request's URL within a reasonable length.
+	const ids = [...userIds];
+	const chunkSize = 50;
+	const users = [];
+
+	for (let i = 0; i < ids.length; i += chunkSize) {
+		const chunk = ids.slice(i, i + chunkSize);
+		const response = await handleRequest('GET', `/api/identity/v1/users/${chunk.join(',')}?includeDeleted=false`);
+
+		// This endpoint wraps results in a `users` array
+		if (!response || !Array.isArray(response.users)) {
+			throw new Error('Invalid response when fetching user details');
+		}
+
 		// Cast id to string for consistency
 		response.users.forEach((user) => {
 			user.id = user.id.toString();
 		});
 
 		users.push(...response.users);
-		if (response.users.length < limit) {
-			hasMoreData = false;
-		}
-		offset += limit;
 	}
+
 	return users;
 }
 
@@ -412,7 +448,7 @@ async function searchUsers(query) {
  * @returns {User} user - Information about the person
  */
 async function getPerson(person) {
-	const response = await handleRequest('GET', `api/identity/v1/users/${person}?parts=detailed`);
+	const response = await handleRequest('GET', `api/identity/v1/users/${person}?parts=DETAILED`);
 	try {
 		const users = response.users;
 		const firstUser = users[0];
