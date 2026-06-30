@@ -252,6 +252,14 @@ async function bulkUpdateUserRoles(people, roleId) {
  * @description Get users that have a grant (or grants by comma separated values)
  * @param {text} grant - grant or grants to search for
  * @returns {object[]} users - Array of users that have that grant
+ * @returns {object[]} users[].attributes - Raw attribute key/value pairs for the user
+ * @returns {text} users[].attributes[].key - The attribute name
+ * @returns {text[]} users[].attributes[].values - The attribute value(s)
+ * @returns {text} users[].id - The user ID
+ * @returns {text} users[].displayName - The user's display name
+ * @returns {number} users[].roleId - The ID of the user's role
+ * @returns {text} users[].emailAddress - The user's email address
+ * @returns {text} users[].userName - The user's username
  */
 async function getUsersByGrant(grant) {
 	// Split the comma-separated grants and normalize
