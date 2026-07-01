@@ -2,19 +2,6 @@
 
 const codeengine = require('codeengine');
 
-/**
- * @typedef {object} User
- * @property {number} id
- * @property {text} displayName
- * @property {text} userName
- * @property {text} emailAddress
- * @property {number} modified
- * @property {number} created
- * @property {number} roleId
- * @property {boolean} isSystemUser
- * @property {boolean} isActive
- */
-
 class Helpers {
 	/**
 	 * @private
@@ -327,6 +314,9 @@ async function getUsersByGrant(grant) {
  * @description Gets members of a group
  * @param {number} groupId - ID of the group
  * @returns {object[]} members - Array of users in the group
+ * @returns {text} members[].type - The member type (e.g. USER)
+ * @returns {text} members[].id - The member's ID
+ * @returns {text} members[].displayName - The member's display name
  */
 async function getGroupMembers(groupId) {
 	const response = await handleRequest('GET', `/api/content/v2/groups/${groupId}/permissions?includeUsers=true`);
@@ -394,7 +384,16 @@ async function convertGroupToDynamic(id, value, key = 'department') {
  * @param {text[]} query.values - Values to filter on
  * @param {text} query.operator - Filter operator (e.g., EQ)
  * @param {text} query.filterType - Filter type (e.g., value)
- * @returns {User[]} users - Array of users that match the query
+ * @returns {object[]} users - Array of users that match the query
+ * @returns {number} users[].id - The user ID
+ * @returns {text} users[].displayName - The user's display name
+ * @returns {text} users[].userName - The user's username
+ * @returns {text} users[].emailAddress - The user's email address
+ * @returns {number} users[].modified - When the user was last modified
+ * @returns {number} users[].created - When the user was created
+ * @returns {number} users[].roleId - The ID of the user's role
+ * @returns {boolean} users[].isSystemUser - Whether the user is a system user
+ * @returns {boolean} users[].isActive - Whether the user is active
  */
 async function searchUsers(query) {
 	const limit = 100;
@@ -453,7 +452,32 @@ async function searchUsers(query) {
  * @summary Get Person
  * @description Get a user object from a person object
  * @param {person} person - The person
- * @returns {User} user - Information about the person
+ * @returns {object} user - Information about the person
+ * @returns {number} user.id - The user ID
+ * @returns {text} user.displayName - The user's display name
+ * @returns {text} user.department - The user's department
+ * @returns {text} user.userName - The user's username
+ * @returns {text} user.emailAddress - The user's email address
+ * @returns {text} user.phoneNumber - The user's phone number
+ * @returns {text} user.deskPhoneNumber - The user's desk phone number
+ * @returns {text} user.title - The user's title
+ * @returns {text} user.timeZone - The user's time zone
+ * @returns {number} user.hireDate - The user's hire date (epoch milliseconds)
+ * @returns {number} user.lastLogin - The user's last login (epoch milliseconds)
+ * @returns {number} user.modified - When the user was last modified (yyyyMMddHHmmss)
+ * @returns {number} user.created - When the user was created (epoch milliseconds)
+ * @returns {text} user.employeeLocation - The user's employee location
+ * @returns {text} user.employeeNumber - The user's employee number
+ * @returns {text} user.employeeId - The user's employee ID
+ * @returns {number} user.roleId - The ID of the user's role
+ * @returns {text} user.reportsTo - The ID of the user this user reports to
+ * @returns {boolean} user.isAnonymous - Whether the user is anonymous
+ * @returns {boolean} user.isSystemUser - Whether the user is a system user
+ * @returns {boolean} user.isPending - Whether the user is pending
+ * @returns {boolean} user.isActive - Whether the user is active
+ * @returns {number} user.invitorUserId - The ID of the user who invited this user
+ * @returns {number} user.lastActivity - The user's last activity (epoch milliseconds)
+ * @returns {text} user.avatarKey - The path to the user's avatar
  */
 async function getPerson(person) {
 	const response = await handleRequest('GET', `api/identity/v1/users/${person}?parts=DETAILED`);
