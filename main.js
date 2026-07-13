@@ -3,26 +3,29 @@
 const codeengine = require('codeengine');
 
 class Helpers {
-  /**
-   * @private
-   * @summary Handle Request
-   * @description Helper function to handle API requests and errors
-   * @param {text} method - The HTTP method
-   * @param {text} url - The endpoint URL
-   * @param {object} [body=null] - The request body
-   * @param {object} [headers=null] - The request headers
-   * @param {text} [contentType='application/json'] - Request body content type
-   * @returns {object} The response data
-   * @throws {error} If the request fails
-   */
-  static async handleRequest(method, url, body = null, headers = null, contentType = 'application/json') {
-    try {
-      return await codeengine.sendRequest(method, url, body, headers, contentType);
-    } catch (error) {
-      console.error(`Error with ${method} request to ${url}\nPayload:\n${JSON.stringify(body, null, 2)}\nError:\n`, error);
-      throw error;
-    }
-  }
+	/**
+	 * @private
+	 * @summary Handle Request
+	 * @description Helper function to handle API requests and errors
+	 * @param {text} method - The HTTP method
+	 * @param {text} url - The endpoint URL
+	 * @param {object} [body=null] - The request body
+	 * @param {object} [headers=null] - The request headers
+	 * @param {text} [contentType='application/json'] - Request body content type
+	 * @returns {object} The response data
+	 * @throws {error} If the request fails
+	 */
+	static async handleRequest(method, url, body = null, headers = null, contentType = 'application/json') {
+		try {
+			return await codeengine.sendRequest(method, url, body, headers, contentType);
+		} catch (error) {
+			console.error(
+				`Error with ${method} request to ${url}\nPayload:\n${JSON.stringify(body, null, 2)}\nError:\n`,
+				error
+			);
+			throw error;
+		}
+	}
 }
 
 const { handleRequest } = Helpers;
@@ -33,11 +36,11 @@ const { handleRequest } = Helpers;
  * @returns {text} uuid
  */
 function generateUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
-      v = c == 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+		var r = (Math.random() * 16) | 0,
+			v = c == 'x' ? r : (r & 0x3) | 0x8;
+		return v.toString(16);
+	});
 }
 
 /**
@@ -47,7 +50,7 @@ function generateUUID() {
  * @returns {number} The length of the list
  */
 function getListOfNumbersLength(list) {
-  return list.length;
+	return list.length;
 }
 
 /**
@@ -58,7 +61,7 @@ function getListOfNumbersLength(list) {
  * @returns {number} The number at the specified index
  */
 function getNumberFromList(list, index) {
-  return list[index];
+	return list[index];
 }
 
 /**
@@ -68,7 +71,7 @@ function getNumberFromList(list, index) {
  * @returns {datetime} datetime - The resulting datetime after conversion
  */
 function castEpochTimestampNumberAsDatetime(epoch) {
-  return new Date(epoch);
+	return new Date(epoch);
 }
 
 /**
@@ -82,29 +85,29 @@ function castEpochTimestampNumberAsDatetime(epoch) {
  * @returns {boolean} success - true if the share succeeded, false if it failed
  */
 async function shareDatasetWithPerson(
-  dataset,
-  person,
-  permission = 'CAN_SHARE',
-  message = 'I thought you might find this dataset interesting.',
-  sendEmail = false
+	dataset,
+	person,
+	permission = 'CAN_SHARE',
+	message = 'I thought you might find this dataset interesting.',
+	sendEmail = false
 ) {
-  const body = {
-    permissions: [
-      {
-        accessLevel: permission,
-        id: person,
-        type: 'USER'
-      }
-    ],
-    message,
-    sendEmail
-  };
-  try {
-    await handleRequest('POST', `/api/data/v3/datasources/${dataset}/share`, body);
-    return true;
-  } catch (error) {
-    return false;
-  }
+	const body = {
+		permissions: [
+			{
+				accessLevel: permission,
+				id: person,
+				type: 'USER'
+			}
+		],
+		message,
+		sendEmail
+	};
+	try {
+		await handleRequest('POST', `/api/data/v3/datasources/${dataset}/share`, body);
+		return true;
+	} catch (error) {
+		return false;
+	}
 }
 
 /**
@@ -118,29 +121,29 @@ async function shareDatasetWithPerson(
  * @returns {boolean} success - true if the share succeeded, false if it failed
  */
 async function shareDatasetWithGroup(
-  dataset,
-  group,
-  permission = 'CAN_SHARE',
-  message = 'I thought you might find this dataset interesting.',
-  sendEmail = false
+	dataset,
+	group,
+	permission = 'CAN_SHARE',
+	message = 'I thought you might find this dataset interesting.',
+	sendEmail = false
 ) {
-  const body = {
-    permissions: [
-      {
-        accessLevel: permission,
-        id: group,
-        type: 'GROUP'
-      }
-    ],
-    message,
-    sendEmail
-  };
-  try {
-    await handleRequest('POST', `/api/data/v3/datasources/${dataset}/share`, body);
-    return true;
-  } catch (error) {
-    return false;
-  }
+	const body = {
+		permissions: [
+			{
+				accessLevel: permission,
+				id: group,
+				type: 'GROUP'
+			}
+		],
+		message,
+		sendEmail
+	};
+	try {
+		await handleRequest('POST', `/api/data/v3/datasources/${dataset}/share`, body);
+		return true;
+	} catch (error) {
+		return false;
+	}
 }
 
 /**
@@ -150,15 +153,15 @@ async function shareDatasetWithGroup(
  * @returns {boolean} result - true if successful
  */
 async function deletePageAndCards(pageId) {
-  const page = await handleRequest('GET', `/api/content/v3/stacks/${pageId}/cards`);
+	const page = await handleRequest('GET', `/api/content/v3/stacks/${pageId}/cards`);
 
-  const cardIds = page.cards.map((card) => card.id).join(',');
+	const cardIds = page.cards.map((card) => card.id).join(',');
 
-  await handleRequest('DELETE', `/api/content/v1/cards/bulk?cardIds=${cardIds}`);
+	await handleRequest('DELETE', `/api/content/v1/cards/bulk?cardIds=${cardIds}`);
 
-  await handleRequest('DELETE', `/api/content/v1/pages/${pageId}`);
+	await handleRequest('DELETE', `/api/content/v1/pages/${pageId}`);
 
-  return true;
+	return true;
 }
 
 /**
@@ -167,7 +170,7 @@ async function deletePageAndCards(pageId) {
  * @param {number} accessTokenId - ID of the access token
  */
 async function deleteAccessToken(accessTokenId) {
-  await handleRequest('DELETE', `api/data/v1/accesstokens/${accessTokenId}`);
+	await handleRequest('DELETE', `api/data/v1/accesstokens/${accessTokenId}`);
 }
 
 /**
@@ -185,14 +188,14 @@ async function deleteAccessToken(accessTokenId) {
  * @param {text} [users[].phoneNumber]
  */
 async function bulkUpdateUsers(users) {
-  for (const user of users) {
-    const { id, ...properties } = user;
-    const attributes = Object.entries(properties).map(([key, value]) => ({
-      key,
-      values: [value === 'empty' ? null : value]
-    }));
-    await updateUserAttributes(id, attributes);
-  }
+	for (const user of users) {
+		const { id, ...properties } = user;
+		const attributes = Object.entries(properties).map(([key, value]) => ({
+			key,
+			values: [value === 'empty' ? null : value]
+		}));
+		await updateUserAttributes(id, attributes);
+	}
 }
 
 /**
@@ -202,9 +205,9 @@ async function bulkUpdateUsers(users) {
  * @param {number} managerId - ID of the manager user to set as reportsTo
  */
 async function updateManager(userId, managerId) {
-  const url = `/api/content/v2/users/${userId}/teams`;
-  const payload = { reportsTo: [{ userId: managerId }] };
-  await handleRequest('POST', url, payload);
+	const url = `/api/content/v2/users/${userId}/teams`;
+	const payload = { reportsTo: [{ userId: managerId }] };
+	await handleRequest('POST', url, payload);
 }
 
 /**
@@ -216,9 +219,9 @@ async function updateManager(userId, managerId) {
  * @param {text[]} attributes[].values
  */
 async function updateUserAttributes(userId, attributes) {
-  await handleRequest('PATCH', `/api/identity/v1/users/${userId}`, {
-    attributes
-  });
+	await handleRequest('PATCH', `/api/identity/v1/users/${userId}`, {
+		attributes
+	});
 }
 
 /**
@@ -228,7 +231,7 @@ async function updateUserAttributes(userId, attributes) {
  * @param {number} roleId - The new role
  */
 async function bulkUpdateUserRoles(people, roleId) {
-  await handleRequest('PUT', `/api/authorization/v1/roles/${roleId}/users`, people);
+	await handleRequest('PUT', `/api/authorization/v1/roles/${roleId}/users`, people);
 }
 
 /**
@@ -246,64 +249,64 @@ async function bulkUpdateUserRoles(people, roleId) {
  * @returns {text} users[].userName - The user's username
  */
 async function getUsersByGrant(grant) {
-  // Split the comma-separated grants and normalize
-  const grants = grant
-    .split(',')
-    .map((g) => g.trim())
-    .filter(Boolean);
+	// Split the comma-separated grants and normalize
+	const grants = grant
+		.split(',')
+		.map((g) => g.trim())
+		.filter(Boolean);
 
-  if (grants.length === 0) {
-    throw new Error('No grant(s) provided to getUsersByGrant');
-  }
+	if (grants.length === 0) {
+		throw new Error('No grant(s) provided to getUsersByGrant');
+	}
 
-  // Collect a de-duplicated set of user IDs across all grants.
-  // The POST multi-authority endpoint returns 403, so we call the
-  // GET endpoint once per authority and merge the results.
-  const userIds = new Set();
+	// Collect a de-duplicated set of user IDs across all grants.
+	// The POST multi-authority endpoint returns 403, so we call the
+	// GET endpoint once per authority and merge the results.
+	const userIds = new Set();
 
-  for (const authority of grants) {
-    const response = await handleRequest(
-      'GET',
-      `/api/authorization/v1/authorities/${encodeURIComponent(authority)}/users-ids`
-    );
+	for (const authority of grants) {
+		const response = await handleRequest(
+			'GET',
+			`/api/authorization/v1/authorities/${encodeURIComponent(authority)}/users-ids`
+		);
 
-    // This endpoint returns a bare array of numeric user IDs
-    if (!Array.isArray(response)) {
-      throw new Error(`Invalid response from getUsersByGrant for authority "${authority}"`);
-    }
+		// This endpoint returns a bare array of numeric user IDs
+		if (!Array.isArray(response)) {
+			throw new Error(`Invalid response from getUsersByGrant for authority "${authority}"`);
+		}
 
-    response.forEach((id) => userIds.add(id.toString()));
-  }
+		response.forEach((id) => userIds.add(id.toString()));
+	}
 
-  if (userIds.size === 0) {
-    return [];
-  }
+	if (userIds.size === 0) {
+		return [];
+	}
 
-  // The authorities endpoint only returns IDs, so hydrate full user
-  // details via the batch users/{ids} lookup. Chunk the IDs to keep
-  // each request's URL within a reasonable length.
-  const ids = [...userIds];
-  const chunkSize = 50;
-  const users = [];
+	// The authorities endpoint only returns IDs, so hydrate full user
+	// details via the batch users/{ids} lookup. Chunk the IDs to keep
+	// each request's URL within a reasonable length.
+	const ids = [...userIds];
+	const chunkSize = 50;
+	const users = [];
 
-  for (let i = 0; i < ids.length; i += chunkSize) {
-    const chunk = ids.slice(i, i + chunkSize);
-    const response = await handleRequest('GET', `/api/identity/v1/users/${chunk.join(',')}?includeDeleted=false`);
+	for (let i = 0; i < ids.length; i += chunkSize) {
+		const chunk = ids.slice(i, i + chunkSize);
+		const response = await handleRequest('GET', `/api/identity/v1/users/${chunk.join(',')}?includeDeleted=false`);
 
-    // This endpoint wraps results in a `users` array
-    if (!response || !Array.isArray(response.users)) {
-      throw new Error('Invalid response when fetching user details');
-    }
+		// This endpoint wraps results in a `users` array
+		if (!response || !Array.isArray(response.users)) {
+			throw new Error('Invalid response when fetching user details');
+		}
 
-    // Cast id to string for consistency
-    response.users.forEach((user) => {
-      user.id = user.id.toString();
-    });
+		// Cast id to string for consistency
+		response.users.forEach((user) => {
+			user.id = user.id.toString();
+		});
 
-    users.push(...response.users);
-  }
+		users.push(...response.users);
+	}
 
-  return users;
+	return users;
 }
 
 /**
@@ -316,9 +319,9 @@ async function getUsersByGrant(grant) {
  * @returns {text} members[].displayName - The member's display name
  */
 async function getGroupMembers(groupId) {
-  const response = await handleRequest('GET', `/api/content/v2/groups/${groupId}/permissions?includeUsers=true`);
-  let members = response.members.filter((m) => m.type != 'GROUP');
-  return members;
+	const response = await handleRequest('GET', `/api/content/v2/groups/${groupId}/permissions?includeUsers=true`);
+	let members = response.members.filter((m) => m.type != 'GROUP');
+	return members;
 }
 
 /**
@@ -331,25 +334,25 @@ async function getGroupMembers(groupId) {
  * @param {text} removeMembers[].id - The user ID
  */
 async function updateGroupMembers(groupId, addMembers, removeMembers) {
-  // Ensure both arrays have the correct structure
-  addMembers = addMembers.map((m) => ({
-    id: m.id,
-    type: 'USER'
-  }));
-  removeMembers = removeMembers.map((m) => ({
-    id: m.id,
-    type: 'USER'
-  }));
-  // Filter out removeMembers from addMembers
-  addMembers = addMembers.filter((m) => !removeMembers.some((r) => r.id === m.id));
-  const body = [
-    {
-      groupId,
-      addMembers,
-      removeMembers
-    }
-  ];
-  await handleRequest('PUT', '/api/content/v2/groups/access', body);
+	// Ensure both arrays have the correct structure
+	addMembers = addMembers.map((m) => ({
+		id: m.id,
+		type: 'USER'
+	}));
+	removeMembers = removeMembers.map((m) => ({
+		id: m.id,
+		type: 'USER'
+	}));
+	// Filter out removeMembers from addMembers
+	addMembers = addMembers.filter((m) => !removeMembers.some((r) => r.id === m.id));
+	const body = [
+		{
+			groupId,
+			addMembers,
+			removeMembers
+		}
+	];
+	await handleRequest('PUT', '/api/content/v2/groups/access', body);
 }
 
 /**
@@ -360,17 +363,17 @@ async function updateGroupMembers(groupId, addMembers, removeMembers) {
  * @param {text} [key='department'] - Attribute key to match on
  */
 async function convertGroupToDynamic(id, value, key = 'department') {
-  const body = {
-    id,
-    type: 'dynamic',
-    dynamicDefinition: {
-      expression: {
-        operator: 'AND',
-        operands: [{ key, value }]
-      }
-    }
-  };
-  await handleRequest('PUT', `/api/content/v2/groups/${id}`, body);
+	const body = {
+		id,
+		type: 'dynamic',
+		dynamicDefinition: {
+			expression: {
+				operator: 'AND',
+				operands: [{ key, value }]
+			}
+		}
+	};
+	await handleRequest('PUT', `/api/content/v2/groups/${id}`, body);
 }
 
 /**
@@ -393,56 +396,56 @@ async function convertGroupToDynamic(id, value, key = 'department') {
  * @returns {boolean} users[].isActive - Whether the user is active
  */
 async function searchUsers(query) {
-  const limit = 100;
-  let offset = 0;
-  let allUsers = [];
-  let hasMoreData = true;
+	const limit = 100;
+	let offset = 0;
+	let allUsers = [];
+	let hasMoreData = true;
 
-  while (hasMoreData) {
-    const body = {
-      cacheBuster: new Date().getTime(),
-      showCount: true,
-      count: false,
-      includeDeleted: false,
-      onlyDeleted: false,
-      includeSupport: false,
-      offset,
-      limit,
-      sort: {
-        field: 'created',
-        order: 'DESC'
-      },
-      filters: [query],
-      parts: ['DETAILED']
-    };
-    const response = await handleRequest('POST', `api/identity/v1/users/search?explain=false`, body);
-    try {
-      const users = response.users;
+	while (hasMoreData) {
+		const body = {
+			cacheBuster: new Date().getTime(),
+			showCount: true,
+			count: false,
+			includeDeleted: false,
+			onlyDeleted: false,
+			includeSupport: false,
+			offset,
+			limit,
+			sort: {
+				field: 'created',
+				order: 'DESC'
+			},
+			filters: [query],
+			parts: ['DETAILED']
+		};
+		const response = await handleRequest('POST', `api/identity/v1/users/search?explain=false`, body);
+		try {
+			const users = response.users;
 
-      const formattedUsers = users.map((user) =>
-        user.attributes.reduce(
-          (map, obj) => ({
-            ...map,
-            [obj.key]: Array.isArray(obj.values) ? obj.values[0] : undefined
-          }),
-          {}
-        )
-      );
-      allUsers.push(...formattedUsers);
+			const formattedUsers = users.map((user) =>
+				user.attributes.reduce(
+					(map, obj) => ({
+						...map,
+						[obj.key]: Array.isArray(obj.values) ? obj.values[0] : undefined
+					}),
+					{}
+				)
+			);
+			allUsers.push(...formattedUsers);
 
-      const totalCount = response.count;
-      if (response.users.length < limit) {
-        hasMoreData = false;
-      }
-      if (totalCount && allUsers.length < totalCount) {
-        offset += limit;
-      }
-    } catch (error) {
-      console.error('Error processing user attributes:', error);
-      hasMoreData = false;
-    }
-  }
-  return allUsers;
+			const totalCount = response.count;
+			if (response.users.length < limit) {
+				hasMoreData = false;
+			}
+			if (totalCount && allUsers.length < totalCount) {
+				offset += limit;
+			}
+		} catch (error) {
+			console.error('Error processing user attributes:', error);
+			hasMoreData = false;
+		}
+	}
+	return allUsers;
 }
 
 /**
@@ -452,51 +455,10 @@ async function searchUsers(query) {
  * @returns {object} user - Information about the person
  * @returns {number} user.id - The user ID
  * @returns {text} [user.displayName] - The user's display name
- * @returns {text} [user.department] - The user's department
- * @returns {text} [user.userName] - The user's username
- * @returns {text} [user.emailAddress] - The user's email address
- * @returns {text} [user.phoneNumber] - The user's phone number
- * @returns {text} [user.deskPhoneNumber] - The user's desk phone number
- * @returns {text} [user.title] - The user's title
- * @returns {text} [user.timeZone] - The user's time zone
- * @returns {number} [user.hireDate] - The user's hire date (epoch milliseconds)
- * @returns {number} [user.lastLogin] - The user's last login (epoch milliseconds)
- * @returns {number} [user.modified] - When the user was last modified (yyyyMMddHHmmss)
- * @returns {number} [user.created] - When the user was created (epoch milliseconds)
- * @returns {text} [user.employeeLocation] - The user's employee location
- * @returns {text} [user.employeeNumber] - The user's employee number
- * @returns {text} [user.employeeId] - The user's employee ID
  * @returns {number} [user.roleId] - The ID of the user's role
- * @returns {text} [user.reportsTo] - The ID of the user this user reports to
- * @returns {boolean} [user.isAnonymous] - Whether the user is anonymous
- * @returns {boolean} [user.isSystemUser] - Whether the user is a system user
- * @returns {boolean} [user.isPending] - Whether the user is pending
- * @returns {boolean} [user.isActive] - Whether the user is active
- * @returns {number} [user.invitorUserId] - The ID of the user who invited this user
- * @returns {number} [user.lastActivity] - The user's last activity (epoch milliseconds)
- * @returns {text} [user.avatarKey] - The path to the user's avatar
  */
 async function getPerson(person) {
-  const response = await handleRequest('GET', `api/identity/v1/users/${person}?parts=DETAILED`);
-  try {
-    const users = response.users;
-    const firstUser = users[0];
-    const attributes = firstUser.attributes;
-
-    if (!attributes || !attributes.length) return undefined;
-
-    const user = attributes.reduce(
-      (map, obj) => ({
-        ...map,
-        [obj.key]: Array.isArray(obj.values) ? obj.values[0] : undefined
-      }),
-      {}
-    );
-    return user;
-  } catch (error) {
-    console.error('Error processing user attributes:', error);
-    return undefined;
-  }
+	return await handleRequest('GET', `api/content/v3/users/${person}`);
 }
 
 /**
@@ -506,7 +468,7 @@ async function getPerson(person) {
  * @returns {person} person - Person object
  */
 async function castUserIdToPerson(userId) {
-  return userId;
+	return userId;
 }
 
 /**
@@ -516,7 +478,7 @@ async function castUserIdToPerson(userId) {
  * @returns {person} person - Person object
  */
 async function castUserIdNumToPerson(userId) {
-  return userId.toString();
+	return userId.toString();
 }
 
 /**
@@ -526,7 +488,7 @@ async function castUserIdNumToPerson(userId) {
  * @returns {person[]} persons - Array of person objects
  */
 async function castUserIdListToPersonList(userIds) {
-  return userIds;
+	return userIds;
 }
 
 /**
@@ -536,7 +498,7 @@ async function castUserIdListToPersonList(userIds) {
  * @returns {person[]} persons - Array of person objects
  */
 async function castUserIdNumListToPersonList(userIds) {
-  return userIds.map(String);
+	return userIds.map(String);
 }
 
 /**
@@ -547,7 +509,7 @@ async function castUserIdNumListToPersonList(userIds) {
  * @returns {text} concatenatedList - Concatenated string of integers
  */
 async function concatNumList(list, separator = ',') {
-  return list.join(separator);
+	return list.join(separator);
 }
 
 /**
@@ -558,11 +520,11 @@ async function concatNumList(list, separator = ',') {
  * @returns {object[]} newList - Resulting array of objects
  */
 async function addObjectToList(object, list = []) {
-  if (list.length) {
-    return list.concat(object);
-  } else {
-    return [object];
-  }
+	if (list.length) {
+		return list.concat(object);
+	} else {
+		return [object];
+	}
 }
 
 /**
@@ -573,11 +535,11 @@ async function addObjectToList(object, list = []) {
  * @returns {text[]} newList - Resulting array of strings
  */
 async function addStringToList(string, list = []) {
-  if (list.length) {
-    return list.concat(string);
-  } else {
-    return [string];
-  }
+	if (list.length) {
+		return list.concat(string);
+	} else {
+		return [string];
+	}
 }
 
 /**
@@ -587,7 +549,19 @@ async function addStringToList(string, list = []) {
  * @returns {boolean} empty - Whether the obj is empty or not
  */
 function checkEmptyObject(obj = {}) {
-  return Object.keys(obj).length === 0;
+	return Object.keys(obj).length === 0;
+}
+
+/**
+ * Collect a single property's value from every object in a list, returning
+ * them as an array of text. Objects missing the property are skipped.
+ * @summary Get Property Values
+ * @param {object[]} items - The objects to read from
+ * @param {text} property - The name of the property to extract from each object
+ * @returns {text[]} values - The property value from each object that has it, as text
+ */
+function getPropertyValues(items, property) {
+	return items.filter((item) => item != null && item[property] != null).map((item) => String(item[property]));
 }
 
 /**
@@ -597,7 +571,6 @@ function checkEmptyObject(obj = {}) {
  * @returns {object} result - Account properties
  */
 async function readAccountCredentials(account) {
-  const acc = await codeengine.getAccount(account.id);
-  return acc.properties;
+	const acc = await codeengine.getAccount(account.id);
+	return acc.properties;
 }
-
