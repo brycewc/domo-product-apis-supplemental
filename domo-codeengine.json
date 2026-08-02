@@ -1,0 +1,10 @@
+{
+  "instance": "domo",
+  "packages": [
+    {
+      "packageId": "3a08d004-f80c-4d44-879f-5b0319968fd1",
+      "sourcePath": "main.js",
+      "release": true
+    }
+  ]
+}

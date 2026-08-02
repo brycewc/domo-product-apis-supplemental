@@ -3,29 +3,29 @@
 const codeengine = require('codeengine');
 
 class Helpers {
-	/**
-	 * @private
-	 * @summary Handle Request
-	 * @description Helper function to handle API requests and errors
-	 * @param {text} method - The HTTP method
-	 * @param {text} url - The endpoint URL
-	 * @param {object} [body=null] - The request body
-	 * @param {object} [headers=null] - The request headers
-	 * @param {text} [contentType='application/json'] - Request body content type
-	 * @returns {object} The response data
-	 * @throws {error} If the request fails
-	 */
-	static async handleRequest(method, url, body = null, headers = null, contentType = 'application/json') {
-		try {
-			return await codeengine.sendRequest(method, url, body, headers, contentType);
-		} catch (error) {
-			console.error(
-				`Error with ${method} request to ${url}\nPayload:\n${JSON.stringify(body, null, 2)}\nError:\n`,
-				error
-			);
-			throw error;
-		}
-	}
+  /**
+   * @private
+   * @summary Handle Request
+   * @description Helper function to handle API requests and errors
+   * @param {text} method - The HTTP method
+   * @param {text} url - The endpoint URL
+   * @param {object} [body=null] - The request body
+   * @param {object} [headers=null] - The request headers
+   * @param {text} [contentType='application/json'] - Request body content type
+   * @returns {object} The response data
+   * @throws {error} If the request fails
+   */
+  static async handleRequest(method, url, body = null, headers = null, contentType = 'application/json') {
+    try {
+      return await codeengine.sendRequest(method, url, body, headers, contentType);
+    } catch (error) {
+      console.error(
+        `Error with ${method} request to ${url}\nPayload:\n${JSON.stringify(body, null, 2)}\nError:\n`,
+        error
+      );
+      throw error;
+    }
+  }
 }
 
 const { handleRequest } = Helpers;
@@ -36,11 +36,11 @@ const { handleRequest } = Helpers;
  * @returns {text} uuid
  */
 function generateUUID() {
-	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-		var r = (Math.random() * 16) | 0,
-			v = c == 'x' ? r : (r & 0x3) | 0x8;
-		return v.toString(16);
-	});
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 }
 
 /**
@@ -50,7 +50,7 @@ function generateUUID() {
  * @returns {number} The length of the list
  */
 function getListOfNumbersLength(list) {
-	return list.length;
+  return list.length;
 }
 
 /**
@@ -61,7 +61,7 @@ function getListOfNumbersLength(list) {
  * @returns {number} The number at the specified index
  */
 function getNumberFromList(list, index) {
-	return list[index];
+  return list[index];
 }
 
 /**
@@ -71,7 +71,7 @@ function getNumberFromList(list, index) {
  * @returns {datetime} datetime - The resulting datetime after conversion
  */
 function castEpochTimestampNumberAsDatetime(epoch) {
-	return new Date(epoch);
+  return new Date(epoch);
 }
 
 /**
@@ -85,29 +85,29 @@ function castEpochTimestampNumberAsDatetime(epoch) {
  * @returns {boolean} success - true if the share succeeded, false if it failed
  */
 async function shareDatasetWithPerson(
-	dataset,
-	person,
-	permission = 'CAN_SHARE',
-	message = 'I thought you might find this dataset interesting.',
-	sendEmail = false
+  dataset,
+  person,
+  permission = 'CAN_SHARE',
+  message = 'I thought you might find this dataset interesting.',
+  sendEmail = false
 ) {
-	const body = {
-		permissions: [
-			{
-				accessLevel: permission,
-				id: person,
-				type: 'USER'
-			}
-		],
-		message,
-		sendEmail
-	};
-	try {
-		await handleRequest('POST', `/api/data/v3/datasources/${dataset}/share`, body);
-		return true;
-	} catch (error) {
-		return false;
-	}
+  const body = {
+    permissions: [
+      {
+        accessLevel: permission,
+        id: person,
+        type: 'USER'
+      }
+    ],
+    message,
+    sendEmail
+  };
+  try {
+    await handleRequest('POST', `/api/data/v3/datasources/${dataset}/share`, body);
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 /**
@@ -121,29 +121,29 @@ async function shareDatasetWithPerson(
  * @returns {boolean} success - true if the share succeeded, false if it failed
  */
 async function shareDatasetWithGroup(
-	dataset,
-	group,
-	permission = 'CAN_SHARE',
-	message = 'I thought you might find this dataset interesting.',
-	sendEmail = false
+  dataset,
+  group,
+  permission = 'CAN_SHARE',
+  message = 'I thought you might find this dataset interesting.',
+  sendEmail = false
 ) {
-	const body = {
-		permissions: [
-			{
-				accessLevel: permission,
-				id: group,
-				type: 'GROUP'
-			}
-		],
-		message,
-		sendEmail
-	};
-	try {
-		await handleRequest('POST', `/api/data/v3/datasources/${dataset}/share`, body);
-		return true;
-	} catch (error) {
-		return false;
-	}
+  const body = {
+    permissions: [
+      {
+        accessLevel: permission,
+        id: group,
+        type: 'GROUP'
+      }
+    ],
+    message,
+    sendEmail
+  };
+  try {
+    await handleRequest('POST', `/api/data/v3/datasources/${dataset}/share`, body);
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 /**
@@ -153,15 +153,15 @@ async function shareDatasetWithGroup(
  * @returns {boolean} result - true if successful
  */
 async function deletePageAndCards(pageId) {
-	const page = await handleRequest('GET', `/api/content/v3/stacks/${pageId}/cards`);
+  const page = await handleRequest('GET', `/api/content/v3/stacks/${pageId}/cards`);
 
-	const cardIds = page.cards.map((card) => card.id).join(',');
+  const cardIds = page.cards.map((card) => card.id).join(',');
 
-	await handleRequest('DELETE', `/api/content/v1/cards/bulk?cardIds=${cardIds}`);
+  await handleRequest('DELETE', `/api/content/v1/cards/bulk?cardIds=${cardIds}`);
 
-	await handleRequest('DELETE', `/api/content/v1/pages/${pageId}`);
+  await handleRequest('DELETE', `/api/content/v1/pages/${pageId}`);
 
-	return true;
+  return true;
 }
 
 /**
@@ -170,7 +170,7 @@ async function deletePageAndCards(pageId) {
  * @param {number} accessTokenId - ID of the access token
  */
 async function deleteAccessToken(accessTokenId) {
-	await handleRequest('DELETE', `api/data/v1/accesstokens/${accessTokenId}`);
+  await handleRequest('DELETE', `api/data/v1/accesstokens/${accessTokenId}`);
 }
 
 /**
@@ -188,14 +188,14 @@ async function deleteAccessToken(accessTokenId) {
  * @param {text} [users[].phoneNumber]
  */
 async function bulkUpdateUsers(users) {
-	for (const user of users) {
-		const { id, ...properties } = user;
-		const attributes = Object.entries(properties).map(([key, value]) => ({
-			key,
-			values: [value === 'empty' ? null : value]
-		}));
-		await updateUserAttributes(id, attributes);
-	}
+  for (const user of users) {
+    const { id, ...properties } = user;
+    const attributes = Object.entries(properties).map(([key, value]) => ({
+      key,
+      values: [value === 'empty' ? null : value]
+    }));
+    await updateUserAttributes(id, attributes);
+  }
 }
 
 /**
@@ -205,9 +205,9 @@ async function bulkUpdateUsers(users) {
  * @param {number} managerId - ID of the manager user to set as reportsTo
  */
 async function updateManager(userId, managerId) {
-	const url = `/api/content/v2/users/${userId}/teams`;
-	const payload = { reportsTo: [{ userId: managerId }] };
-	await handleRequest('POST', url, payload);
+  const url = `/api/content/v2/users/${userId}/teams`;
+  const payload = { reportsTo: [{ userId: managerId }] };
+  await handleRequest('POST', url, payload);
 }
 
 /**
@@ -219,9 +219,9 @@ async function updateManager(userId, managerId) {
  * @param {text[]} attributes[].values
  */
 async function updateUserAttributes(userId, attributes) {
-	await handleRequest('PATCH', `/api/identity/v1/users/${userId}`, {
-		attributes
-	});
+  await handleRequest('PATCH', `/api/identity/v1/users/${userId}`, {
+    attributes
+  });
 }
 
 /**
@@ -231,7 +231,7 @@ async function updateUserAttributes(userId, attributes) {
  * @param {number} roleId - The new role
  */
 async function bulkUpdateUserRoles(people, roleId) {
-	await handleRequest('PUT', `/api/authorization/v1/roles/${roleId}/users`, people);
+  await handleRequest('PUT', `/api/authorization/v1/roles/${roleId}/users`, people);
 }
 
 /**
@@ -249,64 +249,64 @@ async function bulkUpdateUserRoles(people, roleId) {
  * @returns {text} users[].userName - The user's username
  */
 async function getUsersByGrant(grant) {
-	// Split the comma-separated grants and normalize
-	const grants = grant
-		.split(',')
-		.map((g) => g.trim())
-		.filter(Boolean);
+  // Split the comma-separated grants and normalize
+  const grants = grant
+    .split(',')
+    .map((g) => g.trim())
+    .filter(Boolean);
 
-	if (grants.length === 0) {
-		throw new Error('No grant(s) provided to getUsersByGrant');
-	}
+  if (grants.length === 0) {
+    throw new Error('No grant(s) provided to getUsersByGrant');
+  }
 
-	// Collect a de-duplicated set of user IDs across all grants.
-	// The POST multi-authority endpoint returns 403, so we call the
-	// GET endpoint once per authority and merge the results.
-	const userIds = new Set();
+  // Collect a de-duplicated set of user IDs across all grants.
+  // The POST multi-authority endpoint returns 403, so we call the
+  // GET endpoint once per authority and merge the results.
+  const userIds = new Set();
 
-	for (const authority of grants) {
-		const response = await handleRequest(
-			'GET',
-			`/api/authorization/v1/authorities/${encodeURIComponent(authority)}/users-ids`
-		);
+  for (const authority of grants) {
+    const response = await handleRequest(
+      'GET',
+      `/api/authorization/v1/authorities/${encodeURIComponent(authority)}/users-ids`
+    );
 
-		// This endpoint returns a bare array of numeric user IDs
-		if (!Array.isArray(response)) {
-			throw new Error(`Invalid response from getUsersByGrant for authority "${authority}"`);
-		}
+    // This endpoint returns a bare array of numeric user IDs
+    if (!Array.isArray(response)) {
+      throw new Error(`Invalid response from getUsersByGrant for authority "${authority}"`);
+    }
 
-		response.forEach((id) => userIds.add(id.toString()));
-	}
+    response.forEach((id) => userIds.add(id.toString()));
+  }
 
-	if (userIds.size === 0) {
-		return [];
-	}
+  if (userIds.size === 0) {
+    return [];
+  }
 
-	// The authorities endpoint only returns IDs, so hydrate full user
-	// details via the batch users/{ids} lookup. Chunk the IDs to keep
-	// each request's URL within a reasonable length.
-	const ids = [...userIds];
-	const chunkSize = 50;
-	const users = [];
+  // The authorities endpoint only returns IDs, so hydrate full user
+  // details via the batch users/{ids} lookup. Chunk the IDs to keep
+  // each request's URL within a reasonable length.
+  const ids = [...userIds];
+  const chunkSize = 50;
+  const users = [];
 
-	for (let i = 0; i < ids.length; i += chunkSize) {
-		const chunk = ids.slice(i, i + chunkSize);
-		const response = await handleRequest('GET', `/api/identity/v1/users/${chunk.join(',')}?includeDeleted=false`);
+  for (let i = 0; i < ids.length; i += chunkSize) {
+    const chunk = ids.slice(i, i + chunkSize);
+    const response = await handleRequest('GET', `/api/identity/v1/users/${chunk.join(',')}?includeDeleted=false`);
 
-		// This endpoint wraps results in a `users` array
-		if (!response || !Array.isArray(response.users)) {
-			throw new Error('Invalid response when fetching user details');
-		}
+    // This endpoint wraps results in a `users` array
+    if (!response || !Array.isArray(response.users)) {
+      throw new Error('Invalid response when fetching user details');
+    }
 
-		// Cast id to string for consistency
-		response.users.forEach((user) => {
-			user.id = user.id.toString();
-		});
+    // Cast id to string for consistency
+    response.users.forEach((user) => {
+      user.id = user.id.toString();
+    });
 
-		users.push(...response.users);
-	}
+    users.push(...response.users);
+  }
 
-	return users;
+  return users;
 }
 
 /**
@@ -319,9 +319,9 @@ async function getUsersByGrant(grant) {
  * @returns {text} members[].displayName - The member's display name
  */
 async function getGroupMembers(groupId) {
-	const response = await handleRequest('GET', `/api/content/v2/groups/${groupId}/permissions?includeUsers=true`);
-	let members = response.members.filter((m) => m.type != 'GROUP');
-	return members;
+  const response = await handleRequest('GET', `/api/content/v2/groups/${groupId}/permissions?includeUsers=true`);
+  let members = response.members.filter((m) => m.type != 'GROUP');
+  return members;
 }
 
 /**
@@ -334,25 +334,25 @@ async function getGroupMembers(groupId) {
  * @param {text} removeMembers[].id - The user ID
  */
 async function updateGroupMembers(groupId, addMembers, removeMembers) {
-	// Ensure both arrays have the correct structure
-	addMembers = addMembers.map((m) => ({
-		id: m.id,
-		type: 'USER'
-	}));
-	removeMembers = removeMembers.map((m) => ({
-		id: m.id,
-		type: 'USER'
-	}));
-	// Filter out removeMembers from addMembers
-	addMembers = addMembers.filter((m) => !removeMembers.some((r) => r.id === m.id));
-	const body = [
-		{
-			groupId,
-			addMembers,
-			removeMembers
-		}
-	];
-	await handleRequest('PUT', '/api/content/v2/groups/access', body);
+  // Ensure both arrays have the correct structure
+  addMembers = addMembers.map((m) => ({
+    id: m.id,
+    type: 'USER'
+  }));
+  removeMembers = removeMembers.map((m) => ({
+    id: m.id,
+    type: 'USER'
+  }));
+  // Filter out removeMembers from addMembers
+  addMembers = addMembers.filter((m) => !removeMembers.some((r) => r.id === m.id));
+  const body = [
+    {
+      groupId,
+      addMembers,
+      removeMembers
+    }
+  ];
+  await handleRequest('PUT', '/api/content/v2/groups/access', body);
 }
 
 /**
@@ -363,17 +363,17 @@ async function updateGroupMembers(groupId, addMembers, removeMembers) {
  * @param {text} [key='department'] - Attribute key to match on
  */
 async function convertGroupToDynamic(id, value, key = 'department') {
-	const body = {
-		id,
-		type: 'dynamic',
-		dynamicDefinition: {
-			expression: {
-				operator: 'AND',
-				operands: [{ key, value }]
-			}
-		}
-	};
-	await handleRequest('PUT', `/api/content/v2/groups/${id}`, body);
+  const body = {
+    id,
+    type: 'dynamic',
+    dynamicDefinition: {
+      expression: {
+        operator: 'AND',
+        operands: [{ key, value }]
+      }
+    }
+  };
+  await handleRequest('PUT', `/api/content/v2/groups/${id}`, body);
 }
 
 /**
@@ -396,56 +396,56 @@ async function convertGroupToDynamic(id, value, key = 'department') {
  * @returns {boolean} users[].isActive - Whether the user is active
  */
 async function searchUsers(query) {
-	const limit = 100;
-	let offset = 0;
-	let allUsers = [];
-	let hasMoreData = true;
+  const limit = 100;
+  let offset = 0;
+  let allUsers = [];
+  let hasMoreData = true;
 
-	while (hasMoreData) {
-		const body = {
-			cacheBuster: new Date().getTime(),
-			showCount: true,
-			count: false,
-			includeDeleted: false,
-			onlyDeleted: false,
-			includeSupport: false,
-			offset,
-			limit,
-			sort: {
-				field: 'created',
-				order: 'DESC'
-			},
-			filters: [query],
-			parts: ['DETAILED']
-		};
-		const response = await handleRequest('POST', `api/identity/v1/users/search?explain=false`, body);
-		try {
-			const users = response.users;
+  while (hasMoreData) {
+    const body = {
+      cacheBuster: new Date().getTime(),
+      showCount: true,
+      count: false,
+      includeDeleted: false,
+      onlyDeleted: false,
+      includeSupport: false,
+      offset,
+      limit,
+      sort: {
+        field: 'created',
+        order: 'DESC'
+      },
+      filters: [query],
+      parts: ['DETAILED']
+    };
+    const response = await handleRequest('POST', `api/identity/v1/users/search?explain=false`, body);
+    try {
+      const users = response.users;
 
-			const formattedUsers = users.map((user) =>
-				user.attributes.reduce(
-					(map, obj) => ({
-						...map,
-						[obj.key]: Array.isArray(obj.values) ? obj.values[0] : undefined
-					}),
-					{}
-				)
-			);
-			allUsers.push(...formattedUsers);
+      const formattedUsers = users.map((user) =>
+        user.attributes.reduce(
+          (map, obj) => ({
+            ...map,
+            [obj.key]: Array.isArray(obj.values) ? obj.values[0] : undefined
+          }),
+          {}
+        )
+      );
+      allUsers.push(...formattedUsers);
 
-			const totalCount = response.count;
-			if (response.users.length < limit) {
-				hasMoreData = false;
-			}
-			if (totalCount && allUsers.length < totalCount) {
-				offset += limit;
-			}
-		} catch (error) {
-			console.error('Error processing user attributes:', error);
-			hasMoreData = false;
-		}
-	}
-	return allUsers;
+      const totalCount = response.count;
+      if (response.users.length < limit) {
+        hasMoreData = false;
+      }
+      if (totalCount && allUsers.length < totalCount) {
+        offset += limit;
+      }
+    } catch (error) {
+      console.error('Error processing user attributes:', error);
+      hasMoreData = false;
+    }
+  }
+  return allUsers;
 }
 
 /**
@@ -458,7 +458,7 @@ async function searchUsers(query) {
  * @returns {number} [user.roleId] - The ID of the user's role
  */
 async function getPerson(person) {
-	return await handleRequest('GET', `api/content/v3/users/${person}`);
+  return await handleRequest('GET', `api/content/v3/users/${person}`);
 }
 
 /**
@@ -468,7 +468,7 @@ async function getPerson(person) {
  * @returns {person} person - Person object
  */
 async function castUserIdToPerson(userId) {
-	return userId;
+  return userId;
 }
 
 /**
@@ -478,7 +478,7 @@ async function castUserIdToPerson(userId) {
  * @returns {person} person - Person object
  */
 async function castUserIdNumToPerson(userId) {
-	return userId.toString();
+  return userId.toString();
 }
 
 /**
@@ -488,7 +488,7 @@ async function castUserIdNumToPerson(userId) {
  * @returns {person[]} persons - Array of person objects
  */
 async function castUserIdListToPersonList(userIds) {
-	return userIds;
+  return userIds;
 }
 
 /**
@@ -498,7 +498,7 @@ async function castUserIdListToPersonList(userIds) {
  * @returns {person[]} persons - Array of person objects
  */
 async function castUserIdNumListToPersonList(userIds) {
-	return userIds.map(String);
+  return userIds.map(String);
 }
 
 /**
@@ -509,7 +509,7 @@ async function castUserIdNumListToPersonList(userIds) {
  * @returns {text} concatenatedList - Concatenated string of integers
  */
 async function concatNumList(list, separator = ',') {
-	return list.join(separator);
+  return list.join(separator);
 }
 
 /**
@@ -520,11 +520,11 @@ async function concatNumList(list, separator = ',') {
  * @returns {object[]} newList - Resulting array of objects
  */
 async function addObjectToList(object, list = []) {
-	if (list.length) {
-		return list.concat(object);
-	} else {
-		return [object];
-	}
+  if (list.length) {
+    return list.concat(object);
+  } else {
+    return [object];
+  }
 }
 
 /**
@@ -535,11 +535,11 @@ async function addObjectToList(object, list = []) {
  * @returns {text[]} newList - Resulting array of strings
  */
 async function addStringToList(string, list = []) {
-	if (list.length) {
-		return list.concat(string);
-	} else {
-		return [string];
-	}
+  if (list.length) {
+    return list.concat(string);
+  } else {
+    return [string];
+  }
 }
 
 /**
@@ -549,7 +549,7 @@ async function addStringToList(string, list = []) {
  * @returns {boolean} empty - Whether the obj is empty or not
  */
 function checkEmptyObject(obj = {}) {
-	return Object.keys(obj).length === 0;
+  return Object.keys(obj).length === 0;
 }
 
 /**
@@ -561,7 +561,7 @@ function checkEmptyObject(obj = {}) {
  * @returns {text[]} values - The property value from each object that has it, as text
  */
 function getPropertyValues(items, property) {
-	return items.filter((item) => item != null && item[property] != null).map((item) => String(item[property]));
+  return items.filter((item) => item != null && item[property] != null).map((item) => String(item[property]));
 }
 
 /**
@@ -571,6 +571,98 @@ function getPropertyValues(items, property) {
  * @returns {object} result - Account properties
  */
 async function readAccountCredentials(account) {
-	const acc = await codeengine.getAccount(account.id);
-	return acc.properties;
+  const acc = await codeengine.getAccount(account.id);
+  return acc.properties;
+}
+
+/**
+ * @summary Trigger Workflow Latest Version
+ * @description Starts the latest active version of a workflow model and returns details about the execution
+ * @param {text} modelId - ID of the workflow model to trigger
+ * @param {object} [data={}] - Starting parameters to pass to the workflow
+ * @returns {object} execution - Details about the triggered workflow execution
+ * @returns {text} execution.modelId - ID of the workflow model that was triggered
+ * @returns {text} execution.version - The active version that was started
+ * @returns {text} execution.executionId - ID of the workflow execution (instance)
+ * @returns {text} execution.executionLink - Link to the workflow execution in Domo
+ */
+async function triggerWorkflowLatestVersion(modelId, data = {}) {
+  // Get the latest active version and workflow name
+  const modelUrl = `api/workflow/v2/models/${modelId}`;
+  const model = await handleRequest('GET', modelUrl);
+
+  const sortByVersion = (a, b) => {
+    const pa = a.split('.').map(Number);
+    const pb = b.split('.').map(Number);
+    return pb[0] - pa[0] || pb[1] - pa[1] || pb[2] - pa[2];
+  };
+
+  const latestActive = [...model.activeVersions].sort(sortByVersion)[0];
+
+  // Trigger the workflow
+  const response = await handleRequest('POST', 'api/workflow/v1/instances/message', {
+    messageName: `Start ${model.name}`,
+    version: latestActive,
+    modelId,
+    data
+  });
+
+  console.log(`Triggered ${model.name} version ${latestActive}`);
+  return {
+    modelId,
+    version: latestActive,
+    executionId: response.id,
+    executionLink: `https://domo.domo.com/workflows/instances/${modelId}/${latestActive}/${response.id}`
+  };
+}
+
+/**
+ * @summary Trigger Code Engine Package Latest Version
+ * @description Runs a function from the latest released version of a Code Engine package and returns the result
+ * @param {text} packageId - ID of the Code Engine package containing the function
+ * @param {text} functionName - Name of the function in the package to run
+ * @param {object} [inputVariables={}] - Input parameters to pass to the function, keyed by input name
+ * @returns {object} execution - Details about the function run
+ * @returns {text} execution.packageId - ID of the package the function was run from
+ * @returns {text} execution.version - The released version that was run
+ * @returns {text} execution.functionName - Name of the function that was run
+ * @returns {text} execution.packageLink - Link to the package in Domo
+ * @returns {object} execution.result - The raw response from running the function
+ */
+async function triggerCodeEnginePackageLatestVersion(packageId, functionName, inputVariables = {}) {
+  // Get the latest released version and package name
+  const packageUrl = `api/codeengine/v2/packages/${packageId}?parts=versions`;
+  const pkg = await handleRequest('GET', packageUrl);
+
+  const sortByVersion = (a, b) => {
+    const pa = a.split('.').map(Number);
+    const pb = b.split('.').map(Number);
+    return pb[0] - pa[0] || pb[1] - pa[1] || pb[2] - pa[2];
+  };
+
+  // A version is only callable once released, which stamps it with a released date
+  const latestReleased = (pkg.versions || [])
+    .filter((v) => v.released != null)
+    .map((v) => v.version)
+    .sort(sortByVersion)[0];
+
+  if (!latestReleased) {
+    throw new Error(`No released versions found for Code Engine package ${packageId}`);
+  }
+
+  // Run the function
+  const result = await handleRequest(
+    'POST',
+    `api/codeengine/v2/packages/${packageId}/versions/${latestReleased}/functions/${functionName}`,
+    { inputVariables }
+  );
+
+  console.log(`Ran ${functionName} in ${pkg.name || packageId} version ${latestReleased}`);
+  return {
+    packageId,
+    version: latestReleased,
+    functionName,
+    packageLink: `https://domo.domo.com/codeengine/${packageId}`,
+    result
+  };
 }
