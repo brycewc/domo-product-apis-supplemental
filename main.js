@@ -19,10 +19,7 @@ class Helpers {
     try {
       return await codeengine.sendRequest(method, url, body, headers, contentType);
     } catch (error) {
-      console.error(
-        `Error with ${method} request to ${url}\nPayload:\n${JSON.stringify(body, null, 2)}\nError:\n`,
-        error
-      );
+      console.error(`Error with ${method} request to ${url}\nError:\n${typeof error === 'string' ? error : JSON.stringify(error)}\nPayload:\n${JSON.stringify(body, null, 2)}`);
       throw error;
     }
   }
@@ -84,13 +81,7 @@ function castEpochTimestampNumberAsDatetime(epoch) {
  * @param {boolean} [sendEmail=false] - Whether to send an email notification to the person
  * @returns {boolean} success - true if the share succeeded, false if it failed
  */
-async function shareDatasetWithPerson(
-  dataset,
-  person,
-  permission = 'CAN_SHARE',
-  message = 'I thought you might find this dataset interesting.',
-  sendEmail = false
-) {
+async function shareDatasetWithPerson(dataset, person, permission = 'CAN_SHARE', message = 'I thought you might find this dataset interesting.', sendEmail = false) {
   const body = {
     permissions: [
       {
@@ -120,13 +111,7 @@ async function shareDatasetWithPerson(
  * @param {boolean} [sendEmail=false] - Whether to send an email notification to the group
  * @returns {boolean} success - true if the share succeeded, false if it failed
  */
-async function shareDatasetWithGroup(
-  dataset,
-  group,
-  permission = 'CAN_SHARE',
-  message = 'I thought you might find this dataset interesting.',
-  sendEmail = false
-) {
+async function shareDatasetWithGroup(dataset, group, permission = 'CAN_SHARE', message = 'I thought you might find this dataset interesting.', sendEmail = false) {
   const body = {
     permissions: [
       {
@@ -265,10 +250,7 @@ async function getUsersByGrant(grant) {
   const userIds = new Set();
 
   for (const authority of grants) {
-    const response = await handleRequest(
-      'GET',
-      `/api/authorization/v1/authorities/${encodeURIComponent(authority)}/users-ids`
-    );
+    const response = await handleRequest('GET', `/api/authorization/v1/authorities/${encodeURIComponent(authority)}/users-ids`);
 
     // This endpoint returns a bare array of numeric user IDs
     if (!Array.isArray(response)) {
@@ -651,11 +633,7 @@ async function triggerCodeEnginePackageLatestVersion(packageId, functionName, in
   }
 
   // Run the function
-  const result = await handleRequest(
-    'POST',
-    `api/codeengine/v2/packages/${packageId}/versions/${latestReleased}/functions/${functionName}`,
-    { inputVariables }
-  );
+  const result = await handleRequest('POST', `api/codeengine/v2/packages/${packageId}/versions/${latestReleased}/functions/${functionName}`, { inputVariables });
 
   console.log(`Ran ${functionName} in ${pkg.name || packageId} version ${latestReleased}`);
   return {
