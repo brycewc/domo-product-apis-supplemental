@@ -581,13 +581,30 @@ async function triggerWorkflowLatestVersion(modelId, data = {}) {
 
   const latestActive = [...model.activeVersions].sort(sortByVersion)[0];
 
+  // Reuse this package's API trigger on the version, or create it
+  const triggerName = 'CE Domo Product APIs Supplemental - Trigger Workflow Latest Version';
+  const triggers = await handleRequest('GET', `api/workflow/v2/triggers/model/${modelId}?types=API&modelVersions=${latestActive}`);
+  let trigger = (triggers || []).find((t) => t.name === triggerName);
+
+  if (!trigger) {
+    const { userId } = codeengine.getExecutionInformation();
+    trigger = await handleRequest('POST', 'api/workflow/v2/triggers', {
+      name: triggerName,
+      type: 'API',
+      entityId: String(userId),
+      entityType: 'USER',
+      entityVersion: null,
+      metadata: { type: 'API' },
+      modelId,
+      modelVersion: latestActive,
+      schema: {},
+      defaultValues: {},
+      active: true
+    });
+  }
+
   // Trigger the workflow
-  const response = await handleRequest('POST', 'api/workflow/v1/instances/message', {
-    messageName: `Start ${model.name}`,
-    version: latestActive,
-    modelId,
-    data
-  });
+  const response = await handleRequest('POST', `api/workflow/v2/triggers/${trigger.id}/activate`, data);
 
   console.log(`Triggered ${model.name} version ${latestActive}`);
   return {
